@@ -23,8 +23,8 @@ El esqueleto técnico y funcional del proyecto ya está **100% implementado y pr
 ---
 
 ## 🧠 2. Decisiones de Diseño Clave
-1. **Dominio Propuesto:** Mecánicas de Supervivencia y Fabricación en Minecraft.
-   - **Atención:** Se omitieron circuitos lógicos de Redstone para asegurar que el profesor no catalogue el tema como "informática o arquitectura de computadores".
+1. **Dominio Actual (Plantilla de Referencia):** La base de conocimiento actual de Minecraft se incluye como **referencia, prototipo y demostración funcional**. No es definitiva: el equipo puede modificarla, expandirla o reemplazarla por cualquier otro dominio (ej. Maridaje/Vinos, Plantas Medicinales, etc.) cuando lo definan en conjunto.
+   - **Atención si se mantiene Minecraft:** Se omitieron deliberadamente circuitos lógicos de Redstone para asegurar que el profesor no catalogue el tema como "informática o arquitectura de computadores".
 2. **Frontend con Streamlit:** Se eligió Streamlit porque permite tener un chat moderno, selector de modelos y editor de reglas en vivo en un solo archivo legible (`app.py`), ideal para la demo.
 3. **Fácil Extensión en Vivo (Interrogación 80%):** En la barra lateral de la app se incluyó un editor de texto que permite guardar cambios en `base_conocimiento.pl` y recargar la base con un clic.
 

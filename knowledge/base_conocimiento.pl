@@ -2,8 +2,10 @@
 % PROYECTO N°2 - FUNDAMENTOS DE INTELIGENCIA ARTIFICIAL (UNAB)
 % BASE DE CONOCIMIENTO EN PROLOG (LÓGICA DE PRIMER ORDEN)
 % ==============================================================================
-% Este archivo almacena hechos y reglas deductivas del dominio.
-% Se encuentra diseñado para ser extensible en vivo durante la interrogación.
+% NOTA: Esta base de conocimiento se provee como PLANTILLA DE REFERENCIA
+% y demostración funcional. Puede ser modificada, ampliada o reemplazada
+% íntegramente por otro dominio según lo defina el grupo.
+% Se encuentra diseñada para ser extensible en vivo durante la interrogación.
 % ==============================================================================
 
 :- discontiguous categoria/2.

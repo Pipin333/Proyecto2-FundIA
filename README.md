@@ -12,8 +12,9 @@ Este proyecto implementa un sistema inteligente de preguntas y respuestas (Chatb
 2. **Modelos de Lenguaje Basados en Redes Neuronales (LLM):** Implementado en **Python** utilizando **Google Gemini** con inyección contextual de la base de conocimiento del dominio.
 3. **Frontend Interactivo:** Interfaz gráfica web construida con **Streamlit** que permite consultar ambos agentes de forma independiente o en modo **comparativo lado a lado**.
 
-### Dominio Seleccionado
-**Mecánicas de Supervivencia, Fabricación y Ecosistema de Entidades (Minecraft):**
+### Dominio Actual (Plantilla de Referencia)
+> ⚠️ **Nota Importante:** La base de conocimiento actual (*Mecánicas de Supervivencia, Fabricación y Ecosistema de Minecraft*) se encuentra implementada como una **plantilla de referencia y prototipo funcional**. El equipo puede modificarla, ampliarla o reemplazarla por cualquier otro dominio no informático acordado (ej. Maridaje/Coctelería, Botánica, etc.) sin romper la arquitectura del backend ni del frontend.
+
 - **Crafteo e Inferencia de Materiales:** Deducción de cadenas de dependencias y recetas (ej. obtención recursiva de herramientas desde troncos crudos).
 - **Alquimia y Pociones:** Elaboración y dependencias de ingredientes.
 - **Biología y Ecosistema:** Clasificación de entidades (hostiles y pasivas), vulnerabilidades (luz solar, fuego, felinos) y estrategias de defensa.

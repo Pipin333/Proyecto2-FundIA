@@ -7,8 +7,8 @@ Cualquier modelo o agente de IA que trabaje en esta base de código (Claude Code
 ---
 
 ## 🎯 1. Propósito y Restricciones del Proyecto
-1. **Dominio del Conocimiento:** Debe ser un tema del mundo real o sistema formal **no relacionado con la informática**. Actualmente modelado como *Mecánicas de Supervivencia, Fabricación y Ecosistema de Entidades (Minecraft)*.
-   - **Regla Crítica:** NO modelar compuertas lógicas ni circuitos complejos de Redstone para evitar objeciones de que el dominio aborda "arquitectura de computadores o electrónica digital".
+1. **Dominio del Conocimiento:** Debe ser un tema del mundo real o sistema formal **no relacionado con la informática**. Actualmente implementado como *Mecánicas de Supervivencia, Fabricación y Ecosistema de Entidades (Minecraft)* en calidad de **plantilla de referencia y prototipo funcional** (el equipo puede modificarlo o sustituirlo si eligen otro dominio).
+   - **Regla Crítica (si se mantiene Minecraft):** NO modelar compuertas lógicas ni circuitos complejos de Redstone para evitar objeciones de que el dominio aborda "arquitectura de computadores o electrónica digital".
 2. **Dualidad LPO + LLM:** El sistema compara dos enfoques:
    - Razonamiento formal deductivo en **Prolog** (Lógica de Primer Orden, determinista).
    - Razonamiento conversacional con **LLMs** (Python + Google Gemini / OpenAI).
