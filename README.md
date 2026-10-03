@@ -24,7 +24,7 @@ Este proyecto implementa un sistema inteligente de preguntas y respuestas (Chatb
 ## 🏗️ Arquitectura y Estructura del Repositorio
 
 ```text
-FundIA/
+Proyecto2-FundIA/
 ├── knowledge/
 │   ├── base_conocimiento.pl       # Hechos y reglas deductivas en Prolog (LPO)
 │   └── dominio_context.txt        # Contexto del dominio para el motor LLM
@@ -32,12 +32,13 @@ FundIA/
 │   ├── __init__.py
 │   ├── prolog_engine.py           # Conector y ejecutor de consultas SWI-Prolog
 │   └── llm_engine.py              # Integración con Google Gemini API
-├── frontend/                      # (Opcional para componentes adicionales)
 ├── docs/
 │   ├── modelado_fol.md            # Modelado formal en Lógica de Primer Orden
 │   └── evaluacion_20_preguntas.md # Set de 20 preguntas, análisis y propuestas
 ├── app.py                         # Aplicación Web principal (Streamlit)
 ├── requirements.txt               # Dependencias de Python
+├── AGENTS.md                      # Instrucciones para IAs colaboradoras
+├── HANDOFF.md                     # Traspaso del proyecto
 ├── .env.example                   # Plantilla de variables de entorno
 └── README.md                      # Documentación del proyecto
 ```
@@ -61,8 +62,8 @@ FundIA/
 
 1. **Clonar el repositorio:**
    ```bash
-   git clone <URL_DEL_REPOSITORIO>
-   cd FundIA
+   git clone https://github.com/Pipin333/Proyecto2-FundIA.git
+   cd Proyecto2-FundIA
    ```
 
 2. **Crear y activar un entorno virtual (recomendado):**
