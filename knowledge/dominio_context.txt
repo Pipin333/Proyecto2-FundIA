@@ -1,0 +1,32 @@
+# Base de Conocimiento del Dominio: Supervivencia, Fabricación y Ecosistema
+
+## 1. Categorías y Entidades
+- Armas: Espada de Hierro
+- Herramientas: Pico de Hierro
+- Protección: Armadura de Diamante
+- Pociones: Poción de Curación
+- Mobs Hostiles: Zombie, Esqueleto, Creeper
+- Mobs Pasivos: Vaca, Aldeano
+
+## 2. Fabricación y Recetas (Cadena de Dependencias)
+- Espada de Hierro: Requiere Lingote de Hierro y Palo.
+- Pico de Hierro: Requiere Lingote de Hierro y Palo.
+- Palo: Requiere Tabla de Madera.
+- Tabla de Madera: Requiere Tronco de Madera.
+- Poción de Curación: Requiere Verruga del Nether y Sandía Reluciente.
+- Sandía Reluciente: Requiere Pepita de Oro y Rodaja de Sandía.
+
+## 3. Propiedades y Mecánicas
+- Madera: Es inflamable.
+- Hierro: Es resistente y material de transición.
+- Diamante: Posee alta durabilidad y es de nivel avanzado.
+
+## 4. Debilidades y Estrategias
+- Zombie: Es vulnerable al fuego y a la luz solar diurna.
+- Esqueleto: Es vulnerable a los lobos domesticados y a la luz solar diurna.
+- Creeper: Teme y huye de los gatos y ocelotes.
+
+## 5. Reglas Generales
+- Todo mob hostil representa peligro en la noche o en zonas oscuras.
+- Cualquier objeto que requiera oro o diamante directa o indirectamente se considera de nivel avanzado.
+- La obtención de herramientas avanzadas requiere resolver recursivamente la cadena de materiales básicos desde la madera cruda.
