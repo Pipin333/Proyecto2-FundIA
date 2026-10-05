@@ -21,12 +21,9 @@ st.set_page_config(
     layout="wide"
 )
 
-# Inicializar motores
-@st.cache_resource
-def get_engines():
-    return PrologEngine(), LLMEngine()
-
-prolog_engine, llm_engine = get_engines()
+# Inicializar motores (sin caché persistente para recarga en caliente de la base de conocimiento)
+prolog_engine = PrologEngine()
+llm_engine = LLMEngine()
 
 # Estado de la sesión para el historial
 if "messages" not in st.session_state:
