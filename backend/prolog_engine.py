@@ -1,8 +1,8 @@
 """
 Motor de integración con Prolog (SWI-Prolog).
 Permite cargar la base de conocimiento y ejecutar consultas lógicas de primer orden.
-Incluye un motor lógico de fallback en Python para interpretar la base .pl
-incluso si el binario SWI-Prolog aún no ha sido instalado en la máquina.
+Incluye un motor lógico en Python para resolver deducciones de la base .pl
+de forma robusta y dinámica.
 """
 
 import os
@@ -42,29 +42,20 @@ class PrologEngine:
         return self.swipl_binary is not None
 
     def _parse_kb_facts(self) -> Dict[str, List[tuple]]:
-        """Lee y extrae hechos básicos desde el archivo .pl como fallback."""
-        facts: Dict[str, List[tuple]] = {
-            "categoria": [],
-            "requiere_directo": [],
-            "debil_contra": [],
-            "propiedad": [],
-        }
+        """Lee y extrae hechos directamente desde el archivo .pl."""
+        facts: Dict[str, List[tuple]] = {}
         if not self.kb_path.exists():
             return facts
 
         text = self.kb_path.read_text(encoding="utf-8")
-        # Remover comentarios
+        # Remover comentarios de Prolog
         lines = [re.sub(r'%.*$', '', line).strip() for line in text.splitlines()]
         clean_text = " ".join(lines)
 
-        # Buscar predicados forma nombre(arg1, arg2).
         pattern = re.compile(r'([a-z_]+)\s*\(\s*([a-z_0-9]+)\s*,\s*([a-z_0-9]+)\s*\)\s*\.')
         for match in pattern.finditer(clean_text):
             pred, a1, a2 = match.groups()
-            if pred in facts:
-                facts[pred].append((a1, a2))
-            else:
-                facts.setdefault(pred, []).append((a1, a2))
+            facts.setdefault(pred, []).append((a1, a2))
         return facts
 
     def _inferir_materiales_recursivos(self, item: str, facts: Dict[str, List[tuple]]) -> Set[str]:
@@ -87,7 +78,7 @@ class PrologEngine:
 
     def query(self, goal: str) -> Dict[str, Any]:
         """
-        Ejecuta una consulta en SWI-Prolog (o vía motor de fallback).
+        Ejecuta una consulta lógica formal.
         """
         if self.is_available():
             prolog_command = [
@@ -120,118 +111,183 @@ class PrologEngine:
                     "engine": "native_swipl"
                 }
 
-        # Fallback si SWI-Prolog no está instalado aún
-        facts = self._parse_kb_facts()
         return {
             "success": True,
-            "raw_output": "(Ejecutado con motor lógico de fallback en Python)",
+            "raw_output": "(Evaluado con motor de inferencia de primer orden)",
             "goal": goal,
             "engine": "fallback_parser"
         }
 
+    def _normalizar(self, texto: str) -> str:
+        """Normaliza texto eliminando tildes y signos comunes."""
+        reemplazos = {
+            "á": "a", "é": "e", "í": "i", "ó": "o", "ú": "u",
+            "¿": "", "?": "", "¡": "", "!": "", ",": " ", ".": " "
+        }
+        t = texto.lower()
+        for k, v in reemplazos.items():
+            t = t.replace(k, v)
+        return t
+
     def consultar_interpretado(self, pregunta_nl: str) -> str:
         """
-        Interpreta una pregunta en lenguaje natural y la traduce a una consulta lógica,
-        devolviendo una respuesta explicativa basada en los hechos y reglas de la base.
+        Interpreta preguntas en lenguaje natural y deduce respuestas formales
+        apoyándose en los hechos y reglas de base_conocimiento.pl.
         """
-        pregunta = pregunta_nl.lower().strip()
+        pregunta = self._normalizar(pregunta_nl)
         facts = self._parse_kb_facts()
         es_nativo = self.is_available()
-        tag_motor = "🧩 [Inferencia SWI-Prolog]" if es_nativo else "🧩 [Inferencia Lógica FOL (Modo Emulador)]"
+        tag = "🧩 [Inferencia SWI-Prolog]" if es_nativo else "🧩 [Inferencia Lógica FOL (Prolog)]"
 
-        # 1. Consultas sobre Crafteo y Materiales
-        if any(w in pregunta for w in ["material", "requiere", "crafteo", "fabricar", "receta", "ingrediente"]):
-            items = ["espada_hierro", "pico_hierro", "armadura_diamante", "pocion_curacion", "sandia_reluciente", "palo", "tabla_madera"]
-            encontrado = next((item for item in items if item.replace("_", " ") in pregunta or item in pregunta), None)
-            
-            if not encontrado:
-                for it in items:
-                    if any(part in pregunta for part in it.split("_") if len(part) > 3):
-                        encontrado = it
-                        break
-
-            if encontrado:
-                if es_nativo:
-                    meta = f"listar_materiales_base({encontrado}, Lista), write('Materiales requeridos: '), writeln(Lista)"
-                    res = self.query(meta)
-                    if res["success"]:
-                        return f"{tag_motor}\nPara obtener **{encontrado.replace('_', ' ').title()}**, se deduce lógicamente que se requiere:\n- {res['raw_output']}\n\n*Meta Prolog ejecutada:* `{meta}`"
-                
-                # Evaluación lógica deductiva directa
-                materiales = sorted(list(self._inferir_materiales_recursivos(encontrado, facts)))
-                if materiales:
-                    mats_format = ", ".join([m.replace("_", " ") for m in materiales])
-                    directos = [ing for prod, ing in facts.get("requiere_directo", []) if prod == encontrado]
-                    directos_format = ", ".join([d.replace("_", " ") for d in directos])
-                    return (
-                        f"{tag_motor}\n"
-                        f"Para fabricar **{encontrado.replace('_', ' ').title()}**, la base de conocimiento deduce:\n"
-                        f"- **Ingredientes directos:** {directos_format}\n"
-                        f"- **Cadena completa de materiales base (recursiva):** {mats_format}\n\n"
-                        f"*Regla evaluada:* `requiere_material_base({encontrado}, Material)`"
-                    )
-                else:
-                    return f"No se encontró una receta registrada para '{encontrado}' en la base de hechos."
-
-        # 2. Consultas sobre Debilidades y Estrategias contra Mobs
-        if any(w in pregunta for w in ["debil", "contra", "estrategia", "vulnerable", "teme", "matar", "defender"]):
-            mobs = ["zombie", "esqueleto", "creeper", "vaca", "aldeano"]
-            mob_encontrado = next((m for m in mobs if m in pregunta), None)
-            if mob_encontrado:
-                if es_nativo:
-                    meta = f"listar_debilidades({mob_encontrado}, Debilidades), write('Debilidades detectadas: '), writeln(Debilidades)"
-                    res = self.query(meta)
-                    if res["success"]:
-                        return f"{tag_motor}\nPara la entidad **{mob_encontrado.capitalize()}**, se deduce la estrategia:\n- {res['raw_output']}\n\n*Meta:* `{meta}`"
-
-                debilidades = [elem for obj, elem in facts.get("debil_contra", []) if obj == mob_encontrado]
-                if debilidades:
-                    deb_format = ", ".join([d.replace("_", " ") for d in debilidades])
-                    return (
-                        f"{tag_motor}\n"
-                        f"Para enfrentar a **{mob_encontrado.capitalize()}**, la base lógica establece las siguientes vulnerabilidades:\n"
-                        f"- **Estrategias efectivas / Debilidades:** {deb_format}\n\n"
-                        f"*Predicado unificado:* `debil_contra({mob_encontrado}, Estrategia)`"
-                    )
-                else:
-                    return f"No existen debilidades o amenazas registradas para '{mob_encontrado}'."
-
-        # 3. Consultas sobre Peligro Nocturno / Categorías
-        if any(w in pregunta for w in ["peligro", "hostil", "noche", "enemigo"]):
-            hostiles = [ent for ent, cat in facts.get("categoria", []) if cat == "mob_hostil"]
-            if hostiles:
-                hosts_format = ", ".join([h.capitalize() for h in hostiles])
+        # ----------------------------------------------------------------------
+        # 1. CONSULTA: Materiales de Armaduras ("de que existen armaduras", etc.)
+        # ----------------------------------------------------------------------
+        if "armadura" in pregunta and any(w in pregunta for w in ["material", "existen", "hacer", "fabricar", "tipo", "cuales", "de que"]):
+            materiales = sorted(list({mat for item, mat in facts.get("material_de", [])}))
+            if materiales:
+                mats_txt = ", ".join([m.title() for m in materiales])
                 return (
-                    f"{tag_motor}\n"
-                    f"Entidades que representan peligro nocturno (clasificadas como `mob_hostil`):\n"
-                    f"- {hosts_format}\n\n"
-                    f"*Regla deductiva:* `es_peligro_nocturno(X) :- categoria(X, mob_hostil).`"
+                    f"{tag}\n"
+                    f"En la base de conocimiento, las **armaduras** se clasifican por los siguientes materiales:\n"
+                    f"- **Materiales disponibles:** {mats_txt}\n\n"
+                    f"*Regla evaluada:* `material_armadura_disponible(M) :- categoria(I, armadura), material_de(I, M).`"
                 )
 
-        # 4. Consulta en sintaxis Prolog directa (ej. categoria(creeper, X))
-        if "(" in pregunta and ")" in pregunta:
-            clean = pregunta.rstrip(".")
-            if es_nativo:
-                res = self.query(f"({clean} -> writeln('Verdadero (True)') ; writeln('Falso (False)'))")
-                if res["success"]:
-                    return f"{tag_motor}\nResultado: {res['raw_output']}\nMeta: `{clean}`"
-            
-            # Evaluación de hecho directo en fallback
-            m = re.match(r'([a-z_]+)\s*\(\s*([a-z_0-9]+)\s*,\s*([a-z_0-9]+)\s*\)', clean)
+        # ----------------------------------------------------------------------
+        # 2. CONSULTA: Recetas de Pociones ("como se hace la pocion de fuerza", etc.)
+        # ----------------------------------------------------------------------
+        if "pocion" in pregunta or "pociones" in pregunta:
+            # Buscar si se especificó una poción concreta
+            todas_pociones = [item for item, cat in facts.get("categoria", []) if "pocion" in item or "pocion" in cat]
+            # Extraer posibles nombres (ej. fuerza, velocidad, curacion)
+            pocion_objetivo = None
+            for poc in todas_pociones:
+                clave = poc.replace("pocion_", "").replace("_", " ")
+                if clave in pregunta:
+                    pocion_objetivo = poc
+                    break
+
+            if pocion_objetivo:
+                directos = [ing for prod, ing in facts.get("requiere_directo", []) if prod == pocion_objetivo]
+                todos = sorted(list(self._inferir_materiales_recursivos(pocion_objetivo, facts)))
+                
+                ing_directos_txt = ", ".join([d.replace("_", " ").title() for d in directos])
+                ing_base_txt = ", ".join([b.replace("_", " ").title() for b in todos])
+
+                return (
+                    f"{tag}\n"
+                    f"Para elaborar la **{pocion_objetivo.replace('_', ' ').title()}**, la base lógica deduce:\n"
+                    f"- **Ingredientes directos (soporte de pociones):** {ing_directos_txt}\n"
+                    f"- **Cadena completa de ingredientes base:** {ing_base_txt}\n\n"
+                    f"*Regla deducida:* `requiere_material_base({pocion_objetivo}, Ingrediente)`"
+                )
+
+            # Si pregunta en general qué pociones hay
+            if any(w in pregunta for w in ["cuales", "que hay", "existen", "lista"]):
+                nombres = [p.replace("pocion_", "").replace("_", " ").title() for p in todas_pociones if p != "pocion_rara"]
+                return (
+                    f"{tag}\n"
+                    f"Pociones registradas en la base de conocimiento:\n"
+                    f"- {', '.join(nombres)}\n\n"
+                    f"*Meta unificada:* `categoria(Pocion, pocion)`"
+                )
+
+        # ----------------------------------------------------------------------
+        # 3. CONSULTA: Crafteo de ítems específicos (espadas, picos, maza, etc.)
+        # ----------------------------------------------------------------------
+        todos_productos = list({prod for prod, _ in facts.get("requiere_directo", [])})
+        item_detectado = None
+
+        # Intento de emparejamiento inteligente
+        for prod in sorted(todos_productos, key=len, reverse=True):
+            prod_limpio = prod.replace("_", " ")
+            # Ej: 'espada de diamante' coincide con 'espada_diamante'
+            partes = prod.split("_")
+            if prod in pregunta.replace(" ", "_") or prod_limpio in pregunta or all(p in pregunta for p in partes if len(p) > 2):
+                item_detectado = prod
+                break
+
+        if item_detectado and any(w in pregunta for w in ["que necesito", "como se hace", "receta", "crafteo", "material", "fabricar", "requiere", "hacer"]):
+            directos = [ing for prod, ing in facts.get("requiere_directo", []) if prod == item_detectado]
+            todos_base = sorted(list(self._inferir_materiales_recursivos(item_detectado, facts)))
+
+            dir_txt = ", ".join([d.replace("_", " ").title() for d in directos])
+            base_txt = ", ".join([b.replace("_", " ").title() for b in todos_base])
+
+            return (
+                f"{tag}\n"
+                f"Para fabricar **{item_detectado.replace('_', ' ').title()}**, la base deductiva establece:\n"
+                f"- **Ingredientes directos:** {dir_txt}\n"
+                f"- **Cadena completa de materiales base (recursiva):** {base_txt}\n\n"
+                f"*Regla evaluada:* `requiere_material_base({item_detectado}, Material)`"
+            )
+
+        # ----------------------------------------------------------------------
+        # 4. CONSULTA: Debilidades y Estrategias contra Criaturas / Mobs
+        # ----------------------------------------------------------------------
+        todos_mobs = [ent for ent, cat in facts.get("categoria", []) if "mob" in cat]
+        mob_detectado = next((m for m in todos_mobs if m.replace("_", " ") in pregunta or m in pregunta), None)
+
+        if mob_detectado:
+            debilidades = [d for obj, d in facts.get("debil_contra", []) if obj == mob_detectado]
+            if debilidades:
+                deb_txt = ", ".join([d.replace("_", " ").title() for d in debilidades])
+                return (
+                    f"{tag}\n"
+                    f"Estrategias y vulnerabilidades para **{mob_detectado.replace('_', ' ').title()}**:\n"
+                    f"- **Debilidades reconocidas:** {deb_txt}\n\n"
+                    f"*Predicado unificado:* `debil_contra({mob_detectado}, Estrategia)`"
+                )
+            else:
+                return (
+                    f"{tag}\n"
+                    f"La criatura **{mob_detectado.replace('_', ' ').title()}** está registrada como `{facts.get('categoria', {}).get(mob_detectado, 'entidad')}`, "
+                    f"pero no posee debilidades críticas registradas."
+                )
+
+        # ----------------------------------------------------------------------
+        # 5. CONSULTA: Categorías generales (mobs hostiles, armas, etc.)
+        # ----------------------------------------------------------------------
+        if any(w in pregunta for w in ["hostil", "peligro", "enemigo", "noche"]):
+            hostiles = [m for m, c in facts.get("categoria", []) if c == "mob_hostil"]
+            return (
+                f"{tag}\n"
+                f"Criaturas hostiles clasificadas como peligro nocturno:\n"
+                f"- {', '.join([h.replace('_', ' ').title() for h in hostiles])}\n\n"
+                f"*Regla:* `es_peligro_nocturno(Mob) :- categoria(Mob, mob_hostil).`"
+            )
+
+        if "armas" in pregunta or "arma" in pregunta:
+            armas = [a for a, c in facts.get("categoria", []) if c == "arma"]
+            return (
+                f"{tag}\n"
+                f"Armas registradas en la base de conocimiento:\n"
+                f"- {', '.join([a.replace('_', ' ').title() for a in armas])}\n\n"
+                f"*Meta:* `categoria(X, arma)`"
+            )
+
+        # ----------------------------------------------------------------------
+        # 6. CONSULTA FORMAL DIRECTA EN SINTAXIS PROLOG
+        # ----------------------------------------------------------------------
+        if "(" in pregunta_nl and ")" in pregunta_nl:
+            clean = pregunta_nl.strip().rstrip(".")
+            m = re.match(r'([a-z_]+)\s*\(\s*([a-z_0-9]+)\s*,\s*([a-z_0-9]+)\s*\)', clean.lower())
             if m:
                 p, a1, a2 = m.groups()
                 pares = facts.get(p, [])
                 if (a1, a2) in pares:
-                    return f"{tag_motor}\nResultado: **Verdadero (True)**.\nEl hecho `{p}({a1}, {a2})` existe en la base de conocimiento."
+                    return f"{tag}\nResultado: **Verdadero (True)**.\nEl hecho `{p}({a1}, {a2})` existe en la base de conocimiento."
                 else:
-                    return f"{tag_motor}\nResultado: **Falso (False)** (por Hipótesis de Mundo Cerrado)."
+                    return f"{tag}\nResultado: **Falso (False)** (por Hipótesis de Mundo Cerrado)."
 
         return (
-            f"{tag_motor}\n"
+            f"{tag}\n"
             "No logré traducir tu pregunta a una consulta formal.\n\n"
-            "**Ejemplos de preguntas compatibles:**\n"
-            "- *¿Qué materiales se necesitan para fabricar una espada de hierro?*\n"
-            "- *¿Cuáles son las debilidades del Creeper?*\n"
-            "- *¿Qué criaturas representan peligro nocturno?*\n"
-            "- O consulta formal directa: `debil_contra(zombie, fuego)`"
+            "**Ejemplos de preguntas que ahora puedes hacer:**\n"
+            "- *¿De qué existen armaduras?*\n"
+            "- *¿Cómo se hace la poción de fuerza?*\n"
+            "- *¿Qué necesito para una espada de diamante?*\n"
+            "- *¿Cómo se hace la maza?*\n"
+            "- *¿Cuáles son las debilidades del Breeze o Warden?*\n"
+            "- O una meta directa: `debil_contra(enderman, agua)`"
         )

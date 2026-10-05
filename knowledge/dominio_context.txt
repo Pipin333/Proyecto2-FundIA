@@ -1,32 +1,62 @@
-# Base de Conocimiento del Dominio: Supervivencia, Fabricación y Ecosistema
+# Base de Conocimiento del Dominio: Minecraft Java (Mecánicas de Supervivencia y Ecosistema)
 
 ## 1. Categorías y Entidades
-- Armas: Espada de Hierro
-- Herramientas: Pico de Hierro
-- Protección: Armadura de Diamante
-- Pociones: Poción de Curación
-- Mobs Hostiles: Zombie, Esqueleto, Creeper
-- Mobs Pasivos: Vaca, Aldeano
+- **Armas:** Espadas (madera, piedra, hierro, oro, diamante, netherite), Maza (Breeze rod + Heavy core), Arco, Ballesta, Tridente.
+- **Herramientas:** Picos (madera, piedra, hierro, oro, diamante, netherite), Hacha de hierro, Pala de hierro, Azada de hierro.
+- **Armaduras y Piezas:**
+  - Materiales disponibles: Cuero, Hierro, Oro, Diamante, Netherite, Caparazón de Tortuga (casco).
+  - Piezas por material: Casco, Pechera, Pantalones (grebas), Botas.
+  - Armadura de Lobo: Fabricada con escamas de Armadillo.
+- **Pociones:**
+  - Poción Rara (Base de alquimia): Verruga del Nether + Frasco con agua.
+  - Poción de Fuerza: Polvo de Blaze + Poción Rara.
+  - Poción de Velocidad: Azúcar + Poción Rara.
+  - Poción de Curación: Sandía Reluciente + Poción Rara.
+  - Poción de Daño: Ojo de Araña Fermentado + Poción de Curación.
+  - Poción de Visión Nocturna: Zanahoria Dorada + Poción Rara.
+  - Poción de Invisibilidad: Ojo de Araña Fermentado + Poción de Visión Nocturna.
+  - Poción de Resistencia al Fuego: Crema de Magma + Poción Rara.
+  - Poción de Respiración Acuática: Pez Globo + Poción Rara.
+  - Poción de Caída Lenta: Membrana de Fantasma + Poción Rara.
+  - Poción de Regeneración: Lágrima de Ghast + Poción Rara.
+  - Poción de Debilidad: Ojo de Araña Fermentado + Frasco con agua.
+  - Poción de Veneno: Ojo de Araña + Poción Rara.
+  - Poción de la Ventisca: Vara de Brisa (Breeze Rod) + Poción Rara.
+  - Poción Tejedora: Telaraña + Poción Rara.
+- **Mobs Hostiles:** Zombie, Esqueleto, Creeper, Araña, Araña de Cueva, Enderman, Blaze, Ghast, Bruja (Witch), Ahogado (Drowned), Fantasma (Phantom), Warden, Breeze, Bogged (Esqueleto empantanado), Piglin Bruto.
+- **Mobs Pasivos y Neutrales:** Vaca, Oveja, Cerdo, Pollo, Aldeano, Armadillo, Camello, Gato, Lobo, Piglin, Golem de Hierro.
 
 ## 2. Fabricación y Recetas (Cadena de Dependencias)
-- Espada de Hierro: Requiere Lingote de Hierro y Palo.
-- Pico de Hierro: Requiere Lingote de Hierro y Palo.
-- Palo: Requiere Tabla de Madera.
-- Tabla de Madera: Requiere Tronco de Madera.
-- Poción de Curación: Requiere Verruga del Nether y Sandía Reluciente.
-- Sandía Reluciente: Requiere Pepita de Oro y Rodaja de Sandía.
+- **Espadas:** 
+  - Madera: Tabla de madera + Palo.
+  - Piedra: Adoquines + Palo.
+  - Hierro: Lingote de hierro + Palo.
+  - Oro: Lingote de oro + Palo.
+  - Diamante: Diamante + Palo.
+  - Netherite: Espada de diamante + Lingote de netherite + Plantilla de herrería de netherite.
+- **Maza (Mace):** Vara de Brisa (Breeze Rod) + Núcleo Pesado (Heavy Core).
+- **Armaduras de Diamante:** Requieren diamantes directamente.
+- **Armaduras de Netherite:** Requieren la pieza de diamante previa + Lingote de Netherite.
+- **Materiales Base:** 
+  - Palo: Requiere tabla de madera.
+  - Tabla de madera: Requiere tronco de madera.
+  - Lingote de Netherite: 4 fragmentos de netherite + 4 lingotes de oro.
+  - Fragmento de Netherite: Se funden escombros ancestrales (Ancient Debris).
 
-## 3. Propiedades y Mecánicas
-- Madera: Es inflamable.
-- Hierro: Es resistente y material de transición.
-- Diamante: Posee alta durabilidad y es de nivel avanzado.
+## 3. Vulnerabilidades y Estrategias contra Mobs
+- **Zombie:** Vulnerable a la luz solar diurna, fuego y daño por poción de curación (undead).
+- **Esqueleto:** Vulnerable a la luz solar diurna, a los lobos domesticados y a pociones de curación.
+- **Creeper:** Teme y huye de los gatos y ocelotes.
+- **Enderman:** Sufre daño severo con el agua y la lluvia.
+- **Blaze:** Extremadamente vulnerable a las bolas de nieve y al agua.
+- **Breeze (Brisa):** Vulnerable al combate cuerpo a cuerpo y a proyectiles reflejados; inmune a proyectiles directos normales.
+- **Bogged (Empantanado):** Vulnerable a la luz solar diurna y a los lobos.
+- **Warden:** Vulnerable a la distracción acústica (flechas o proyectiles que generen vibraciones lejanas).
+- **Phantom:** Arde con la luz solar y huye de los gatos.
 
-## 4. Debilidades y Estrategias
-- Zombie: Es vulnerable al fuego y a la luz solar diurna.
-- Esqueleto: Es vulnerable a los lobos domesticados y a la luz solar diurna.
-- Creeper: Teme y huye de los gatos y ocelotes.
-
-## 5. Reglas Generales
-- Todo mob hostil representa peligro en la noche o en zonas oscuras.
-- Cualquier objeto que requiera oro o diamante directa o indirectamente se considera de nivel avanzado.
-- La obtención de herramientas avanzadas requiere resolver recursivamente la cadena de materiales básicos desde la madera cruda.
+## 4. Propiedades y Mecánicas
+- La madera es inflamable.
+- El oro pacifica a los Piglins en el Nether.
+- El diamante ofrece alta durabilidad.
+- La netherite flota en la lava y es inmune al fuego.
+- Todas las criaturas clasificadas como no-muertos (undead) arden bajo la luz solar a cielo despejado.
