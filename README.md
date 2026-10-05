@@ -5,9 +5,9 @@
 **Facultad de Ingeniería — Ingeniería Civil Informática**  
 **Curso:** Fundamentos de Inteligencia Artificial  
 ---
-**Integrantes:** Carlos Castro
-Iván Gómez
-Matias Rodrigues
+**Integrantes:** Carlos Castro,
+Iván Gómez,
+Matias Rodrigues,
 Felipe Riquelme
 
 ---
