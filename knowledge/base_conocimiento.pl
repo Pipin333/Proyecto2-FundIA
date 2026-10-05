@@ -14,6 +14,8 @@
 :- discontiguous requiere_directo/2.
 :- discontiguous debil_contra/2.
 :- discontiguous propiedad/2.
+:- discontiguous puntos_vida/2.
+:- discontiguous alias/2.
 :- discontiguous drop_habitual/2.
 :- discontiguous habitad_principal/2.
 
@@ -128,6 +130,33 @@ categoria(gato, mob_pasivo).
 categoria(lobo, mob_neutral).
 categoria(piglin, mob_neutral).
 categoria(golem_hierro, mob_neutral).
+
+% Jefes (Bosses)
+categoria(ender_dragon, jefe).
+categoria(wither, jefe).
+
+% Puntos de Vida (Salud / HP)
+puntos_vida(ender_dragon, 200).
+puntos_vida(warden, 500).
+puntos_vida(wither, 300).
+puntos_vida(golem_hierro, 100).
+puntos_vida(piglin_brute, 50).
+puntos_vida(enderman, 40).
+puntos_vida(breeze, 30).
+puntos_vida(zombie, 20).
+puntos_vida(esqueleto, 20).
+puntos_vida(creeper, 20).
+puntos_vida(aldeano, 20).
+puntos_vida(arana, 16).
+puntos_vida(armadillo, 12).
+puntos_vida(vaca, 10).
+
+% Alias y Sinónimos populares
+alias(dragona, ender_dragon).
+alias(dragon, ender_dragon).
+alias(dragon_del_end, ender_dragon).
+alias(jean, ender_dragon).
+alias(golem, golem_hierro).
 
 % ==============================================================================
 % 2. CLASIFICACIÓN DE PIEZAS Y MATERIALES DE ARMADURA
@@ -365,6 +394,12 @@ debil_contra(phantom, luz_solar).
 debil_contra(phantom, gato).
 
 debil_contra(drowned, luz_solar).
+
+debil_contra(ender_dragon, destruir_cristales_end).
+debil_contra(ender_dragon, explosiones_camas).
+
+debil_contra(wither, pocion_curacion).
+debil_contra(wither, combate_cuerpo_a_cuerpo_fase2).
 
 % Propiedades
 propiedad(madera, inflamable).

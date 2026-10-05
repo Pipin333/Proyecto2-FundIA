@@ -24,7 +24,9 @@
   - Poción de la Ventisca: Vara de Brisa (Breeze Rod) + Poción Rara.
   - Poción Tejedora: Telaraña + Poción Rara.
 - **Mobs Hostiles:** Zombie, Esqueleto, Creeper, Araña, Araña de Cueva, Enderman, Blaze, Ghast, Bruja (Witch), Ahogado (Drowned), Fantasma (Phantom), Warden, Breeze, Bogged (Esqueleto empantanado), Piglin Bruto.
-- **Mobs Pasivos y Neutrales:** Vaca, Oveja, Cerdo, Pollo, Aldeano, Armadillo, Camello, Gato, Lobo, Piglin, Golem de Hierro.
+- **Jefes (Bosses):** Ender Dragon (Dragona, 200 HP / 100 corazones), Wither (300 HP / 150 corazones).
+- **Mobs Pasivos y Neutrales:** Vaca, Oveja, Cerdo, Pollo, Aldeano, Armadillo, Camello, Gato, Lobo, Piglin, Golem de Hierro (100 HP).
+- **Estadísticas de Vida Base:** Warden (500 HP), Ender Dragon (200 HP), Golem de Hierro (100 HP), Piglin Bruto (50 HP), Enderman (40 HP), Breeze (30 HP), Zombie/Esqueleto/Creeper (20 HP).
 
 ## 2. Fabricación y Recetas (Cadena de Dependencias)
 - **Espadas:** 

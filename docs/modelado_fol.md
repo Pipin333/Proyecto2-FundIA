@@ -31,6 +31,7 @@ Se excluyen deliberadamente componentes de circuitos y compuertas lógicas (Reds
 - $\text{Propiedad}(x, p)$: El material $x$ posee la característica física o mágica $p$.
 - $\text{EsPeligroNocturno}(m)$: La entidad $m$ representa una amenaza hostil durante la noche.
 - $\text{MaterialArmaduraDisponible}(m)$: El material $m$ permite confeccionar piezas de armadura protectora.
+- $\text{PuntosVida}(x, hp)$: La entidad $x$ posee una cantidad máxima de $hp$ puntos de vida base.
 
 ---
 

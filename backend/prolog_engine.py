@@ -140,6 +140,29 @@ class PrologEngine:
         tag = "🧩 [Inferencia SWI-Prolog]" if es_nativo else "🧩 [Inferencia Lógica FOL (Prolog)]"
 
         # ----------------------------------------------------------------------
+        # RESOLUCIÓN DE ALIAS Y SINÓNIMOS (dragona -> ender_dragon, etc.)
+        # ----------------------------------------------------------------------
+        for a, canonico in facts.get("alias", []):
+            if a in pregunta:
+                pregunta = re.sub(r'\b' + re.escape(a) + r'\b', canonico, pregunta)
+
+        # ----------------------------------------------------------------------
+        # CONSULTA: Puntos de Vida / Salud ("cuanta vida tiene la dragona", etc.)
+        # ----------------------------------------------------------------------
+        if any(w in pregunta for w in ["vida", "salud", "hp", "corazones"]):
+            puntos_dict = {ent: int(hp) for ent, hp in facts.get("puntos_vida", [])}
+            ent_encontrada = next((ent for ent in puntos_dict if ent in pregunta or ent.replace("_", " ") in pregunta), None)
+            if ent_encontrada:
+                hp = puntos_dict[ent_encontrada]
+                corazones = hp // 2
+                return (
+                    f"{tag}\n"
+                    f"Estadísticas de salud para **{ent_encontrada.replace('_', ' ').title()}**:\n"
+                    f"- **Puntos de vida (HP):** {hp} puntos ({corazones} corazones ❤️)\n\n"
+                    f"*Predicado evaluado:* `puntos_vida({ent_encontrada}, {hp})`"
+                )
+
+        # ----------------------------------------------------------------------
         # 1. CONSULTA: Materiales de Armaduras ("de que existen armaduras", etc.)
         # ----------------------------------------------------------------------
         if "armadura" in pregunta and any(w in pregunta for w in ["material", "existen", "hacer", "fabricar", "tipo", "cuales", "de que"]):
