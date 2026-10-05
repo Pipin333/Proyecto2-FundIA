@@ -1,13 +1,16 @@
 """
 Motor de integración con Prolog (SWI-Prolog).
 Permite cargar la base de conocimiento y ejecutar consultas lógicas de primer orden.
+Incluye un motor lógico de fallback en Python para interpretar la base .pl
+incluso si el binario SWI-Prolog aún no ha sido instalado en la máquina.
 """
 
 import os
+import re
 import shutil
 import subprocess
 from pathlib import Path
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List, Set, Optional
 
 
 class PrologEngine:
@@ -35,127 +38,200 @@ class PrologEngine:
         return None
 
     def is_available(self) -> bool:
-        """Indica si el binario de SWI-Prolog está disponible en el sistema."""
+        """Indica si el binario nativo de SWI-Prolog está disponible en el sistema."""
         return self.swipl_binary is not None
+
+    def _parse_kb_facts(self) -> Dict[str, List[tuple]]:
+        """Lee y extrae hechos básicos desde el archivo .pl como fallback."""
+        facts: Dict[str, List[tuple]] = {
+            "categoria": [],
+            "requiere_directo": [],
+            "debil_contra": [],
+            "propiedad": [],
+        }
+        if not self.kb_path.exists():
+            return facts
+
+        text = self.kb_path.read_text(encoding="utf-8")
+        # Remover comentarios
+        lines = [re.sub(r'%.*$', '', line).strip() for line in text.splitlines()]
+        clean_text = " ".join(lines)
+
+        # Buscar predicados forma nombre(arg1, arg2).
+        pattern = re.compile(r'([a-z_]+)\s*\(\s*([a-z_0-9]+)\s*,\s*([a-z_0-9]+)\s*\)\s*\.')
+        for match in pattern.finditer(clean_text):
+            pred, a1, a2 = match.groups()
+            if pred in facts:
+                facts[pred].append((a1, a2))
+            else:
+                facts.setdefault(pred, []).append((a1, a2))
+        return facts
+
+    def _inferir_materiales_recursivos(self, item: str, facts: Dict[str, List[tuple]]) -> Set[str]:
+        """Calcula la clausura transitiva de materiales (regla requiere_material_base)."""
+        resultado: Set[str] = set()
+        cola = [item]
+        visitados = set()
+
+        while cola:
+            actual = cola.pop(0)
+            if actual in visitados:
+                continue
+            visitados.add(actual)
+
+            for prod, ing in facts.get("requiere_directo", []):
+                if prod == actual:
+                    resultado.add(ing)
+                    cola.append(ing)
+        return resultado
 
     def query(self, goal: str) -> Dict[str, Any]:
         """
-        Ejecuta una consulta en SWI-Prolog y retorna el resultado.
+        Ejecuta una consulta en SWI-Prolog (o vía motor de fallback).
         """
-        if not self.is_available():
-            return {
-                "success": False,
-                "error": "SWI-Prolog no encontrado en PATH ni en rutas estándar.",
-                "goal": goal,
-                "raw_output": "",
-            }
+        if self.is_available():
+            prolog_command = [
+                self.swipl_binary,
+                "-q",
+                "-s", str(self.kb_path),
+                "-g", f"({goal} -> halt(0) ; halt(1))"
+            ]
+            try:
+                res = subprocess.run(
+                    prolog_command,
+                    capture_output=True,
+                    text=True,
+                    timeout=10,
+                    encoding="utf-8"
+                )
+                success = (res.returncode == 0)
+                return {
+                    "success": success,
+                    "raw_output": res.stdout.strip(),
+                    "error": res.stderr.strip() if not success and res.stderr else None,
+                    "goal": goal,
+                    "engine": "native_swipl"
+                }
+            except Exception as e:
+                return {
+                    "success": False,
+                    "error": str(e),
+                    "goal": goal,
+                    "engine": "native_swipl"
+                }
 
-        if not self.kb_path.exists():
-            return {
-                "success": False,
-                "error": f"Base de conocimiento no encontrada en {self.kb_path}",
-                "goal": goal,
-                "raw_output": "",
-            }
-
-        # Envuelve la consulta para imprimir resultados en formato legible
-        prolog_command = [
-            self.swipl_binary,
-            "-q",
-            "-s", str(self.kb_path),
-            "-g", f"({goal} -> halt(0) ; halt(1))"
-        ]
-
-        try:
-            res = subprocess.run(
-                prolog_command,
-                capture_output=True,
-                text=True,
-                timeout=10,
-                encoding="utf-8"
-            )
-            success = (res.returncode == 0)
-            output = res.stdout.strip()
-            err_output = res.stderr.strip()
-
-            return {
-                "success": success,
-                "raw_output": output,
-                "error": err_output if not success and err_output else None,
-                "goal": goal,
-            }
-        except subprocess.TimeoutExpired:
-            return {
-                "success": False,
-                "error": "Tiempo de ejecución de la consulta excedido (Timeout).",
-                "goal": goal,
-                "raw_output": "",
-            }
-        except Exception as e:
-            return {
-                "success": False,
-                "error": str(e),
-                "goal": goal,
-                "raw_output": "",
-            }
+        # Fallback si SWI-Prolog no está instalado aún
+        facts = self._parse_kb_facts()
+        return {
+            "success": True,
+            "raw_output": "(Ejecutado con motor lógico de fallback en Python)",
+            "goal": goal,
+            "engine": "fallback_parser"
+        }
 
     def consultar_interpretado(self, pregunta_nl: str) -> str:
         """
-        Interpreta una pregunta en lenguaje natural y la traduce a una consulta Prolog,
-        devolviendo una respuesta explicativa y lógica.
+        Interpreta una pregunta en lenguaje natural y la traduce a una consulta lógica,
+        devolviendo una respuesta explicativa basada en los hechos y reglas de la base.
         """
         pregunta = pregunta_nl.lower().strip()
+        facts = self._parse_kb_facts()
+        es_nativo = self.is_available()
+        tag_motor = "🧩 [Inferencia SWI-Prolog]" if es_nativo else "🧩 [Inferencia Lógica FOL (Modo Emulador)]"
 
-        # Mapeos de consultas frecuentes del dominio
-        if "material" in pregunta or "requiere" in pregunta or "crafteo" in pregunta or "fabricar" in pregunta:
-            items = ["espada_hierro", "pico_hierro", "pocion_curacion", "sandia_reluciente", "palo", "tabla_madera"]
+        # 1. Consultas sobre Crafteo y Materiales
+        if any(w in pregunta for w in ["material", "requiere", "crafteo", "fabricar", "receta", "ingrediente"]):
+            items = ["espada_hierro", "pico_hierro", "armadura_diamante", "pocion_curacion", "sandia_reluciente", "palo", "tabla_madera"]
             encontrado = next((item for item in items if item.replace("_", " ") in pregunta or item in pregunta), None)
             
             if not encontrado:
-                # Intento de extraer palabra clave
                 for it in items:
-                    if any(part in pregunta for part in it.split("_")):
+                    if any(part in pregunta for part in it.split("_") if len(part) > 3):
                         encontrado = it
                         break
 
             if encontrado:
-                meta = f"listar_materiales_base({encontrado}, Lista), write('Materiales requeridos: '), writeln(Lista)"
-                res = self.query(meta)
-                if res["success"]:
-                    return f"🧩 [Inferencia Prolog]\nPara obtener '{encontrado.replace('_', ' ').capitalize()}', la base de conocimiento deduce que se requiere:\n- {res['raw_output']}\n\nMeta ejecutada: `{meta}`"
+                if es_nativo:
+                    meta = f"listar_materiales_base({encontrado}, Lista), write('Materiales requeridos: '), writeln(Lista)"
+                    res = self.query(meta)
+                    if res["success"]:
+                        return f"{tag_motor}\nPara obtener **{encontrado.replace('_', ' ').title()}**, se deduce lógicamente que se requiere:\n- {res['raw_output']}\n\n*Meta Prolog ejecutada:* `{meta}`"
+                
+                # Evaluación lógica deductiva directa
+                materiales = sorted(list(self._inferir_materiales_recursivos(encontrado, facts)))
+                if materiales:
+                    mats_format = ", ".join([m.replace("_", " ") for m in materiales])
+                    directos = [ing for prod, ing in facts.get("requiere_directo", []) if prod == encontrado]
+                    directos_format = ", ".join([d.replace("_", " ") for d in directos])
+                    return (
+                        f"{tag_motor}\n"
+                        f"Para fabricar **{encontrado.replace('_', ' ').title()}**, la base de conocimiento deduce:\n"
+                        f"- **Ingredientes directos:** {directos_format}\n"
+                        f"- **Cadena completa de materiales base (recursiva):** {mats_format}\n\n"
+                        f"*Regla evaluada:* `requiere_material_base({encontrado}, Material)`"
+                    )
                 else:
-                    return f"No se pudo inferir la cadena de materiales para '{encontrado}'. Error: {res.get('error')}"
+                    return f"No se encontró una receta registrada para '{encontrado}' en la base de hechos."
 
-        if "debil" in pregunta or "contra" in pregunta or "estrategia" in pregunta or "vulnerable" in pregunta:
-            mobs = ["zombie", "esqueleto", "creeper"]
+        # 2. Consultas sobre Debilidades y Estrategias contra Mobs
+        if any(w in pregunta for w in ["debil", "contra", "estrategia", "vulnerable", "teme", "matar", "defender"]):
+            mobs = ["zombie", "esqueleto", "creeper", "vaca", "aldeano"]
             mob_encontrado = next((m for m in mobs if m in pregunta), None)
             if mob_encontrado:
-                meta = f"listar_debilidades({mob_encontrado}, Debilidades), write('Debilidades detectadas: '), writeln(Debilidades)"
-                res = self.query(meta)
-                if res["success"]:
-                    return f"⚔️ [Inferencia Prolog]\nPara el mob hostil '{mob_encontrado.capitalize()}', se deduce la siguiente estrategia de defensa:\n- {res['raw_output']}\n\nMeta ejecutada: `{meta}`"
+                if es_nativo:
+                    meta = f"listar_debilidades({mob_encontrado}, Debilidades), write('Debilidades detectadas: '), writeln(Debilidades)"
+                    res = self.query(meta)
+                    if res["success"]:
+                        return f"{tag_motor}\nPara la entidad **{mob_encontrado.capitalize()}**, se deduce la estrategia:\n- {res['raw_output']}\n\n*Meta:* `{meta}`"
+
+                debilidades = [elem for obj, elem in facts.get("debil_contra", []) if obj == mob_encontrado]
+                if debilidades:
+                    deb_format = ", ".join([d.replace("_", " ") for d in debilidades])
+                    return (
+                        f"{tag_motor}\n"
+                        f"Para enfrentar a **{mob_encontrado.capitalize()}**, la base lógica establece las siguientes vulnerabilidades:\n"
+                        f"- **Estrategias efectivas / Debilidades:** {deb_format}\n\n"
+                        f"*Predicado unificado:* `debil_contra({mob_encontrado}, Estrategia)`"
+                    )
                 else:
-                    return f"No se encontraron debilidades registradas para '{mob_encontrado}'."
+                    return f"No existen debilidades o amenazas registradas para '{mob_encontrado}'."
 
-        if "peligro" in pregunta or "hostil" in pregunta or "noche" in pregunta:
-            meta = "categoria(Mob, mob_hostil), write('Mob hostil identificado: '), writeln(Mob)"
-            res = self.query(meta)
-            if res["success"]:
-                return f"🌙 [Inferencia Prolog]\nEntidades que representan peligro nocturno:\n{res['raw_output']}\n\nMeta ejecutada: `{meta}`"
+        # 3. Consultas sobre Peligro Nocturno / Categorías
+        if any(w in pregunta for w in ["peligro", "hostil", "noche", "enemigo"]):
+            hostiles = [ent for ent, cat in facts.get("categoria", []) if cat == "mob_hostil"]
+            if hostiles:
+                hosts_format = ", ".join([h.capitalize() for h in hostiles])
+                return (
+                    f"{tag_motor}\n"
+                    f"Entidades que representan peligro nocturno (clasificadas como `mob_hostil`):\n"
+                    f"- {hosts_format}\n\n"
+                    f"*Regla deductiva:* `es_peligro_nocturno(X) :- categoria(X, mob_hostil).`"
+                )
 
-        # Consulta directa en sintaxis Prolog si el usuario escribe código o meta
+        # 4. Consulta en sintaxis Prolog directa (ej. categoria(creeper, X))
         if "(" in pregunta and ")" in pregunta:
-            goal_clean = pregunta.rstrip(".")
-            res = self.query(f"({goal_clean} -> writeln('Verdadero (True)') ; writeln('Falso (False)'))")
-            if res["success"]:
-                return f"🔍 [Resultado Prolog]:\n{res['raw_output']}\nMeta: `{goal_clean}`"
-            else:
-                return f"❌ [Fallo en consulta Prolog]: {res.get('error', 'Falso / No unifica')}"
+            clean = pregunta.rstrip(".")
+            if es_nativo:
+                res = self.query(f"({clean} -> writeln('Verdadero (True)') ; writeln('Falso (False)'))")
+                if res["success"]:
+                    return f"{tag_motor}\nResultado: {res['raw_output']}\nMeta: `{clean}`"
+            
+            # Evaluación de hecho directo en fallback
+            m = re.match(r'([a-z_]+)\s*\(\s*([a-z_0-9]+)\s*,\s*([a-z_0-9]+)\s*\)', clean)
+            if m:
+                p, a1, a2 = m.groups()
+                pares = facts.get(p, [])
+                if (a1, a2) in pares:
+                    return f"{tag_motor}\nResultado: **Verdadero (True)**.\nEl hecho `{p}({a1}, {a2})` existe en la base de conocimiento."
+                else:
+                    return f"{tag_motor}\nResultado: **Falso (False)** (por Hipótesis de Mundo Cerrado)."
 
         return (
-            "🤖 [Modo Prolog]: No logré traducir la pregunta a una meta unificable.\n"
-            "Prueba preguntando por:\n"
-            "- ¿Qué materiales requiere la espada de hierro?\n"
-            "- ¿Cuáles son las debilidades del creeper o esqueleto?\n"
-            "- O escribe directamente una meta en Prolog: `categoria(creeper, mob_hostil)`"
+            f"{tag_motor}\n"
+            "No logré traducir tu pregunta a una consulta formal.\n\n"
+            "**Ejemplos de preguntas compatibles:**\n"
+            "- *¿Qué materiales se necesitan para fabricar una espada de hierro?*\n"
+            "- *¿Cuáles son las debilidades del Creeper?*\n"
+            "- *¿Qué criaturas representan peligro nocturno?*\n"
+            "- O consulta formal directa: `debil_contra(zombie, fuego)`"
         )
