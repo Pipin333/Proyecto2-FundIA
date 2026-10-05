@@ -14,9 +14,9 @@ Se excluyen deliberadamente componentes de circuitos y compuertas lógicas (Reds
 ## 2. Elementos del Lenguaje Formal
 
 ### 2.1 Constantes
-- **Materiales:** `madera`, `piedra`, `cuero`, `hierro`, `oro`, `diamante`, `netherite`.
-- **Armas y Herramientas:** `espada_madera`, `espada_piedra`, `espada_hierro`, `espada_oro`, `espada_diamante`, `espada_netherite`, `maza`, `pico_hierro`, `pico_diamante`, etc.
-- **Armaduras:** `casco_cuero`, `pechera_cuero`, `casco_hierro`, `pechera_hierro`, `casco_diamante`, `pechera_diamante`, `casco_netherite`, `pechera_netherite`, `caparazon_tortuga`.
+- **Materiales:** `madera`, `piedra`, `cuero`, `cobre`, `hierro`, `oro`, `diamante`, `netherite`.
+- **Armas y Herramientas:** `espada_madera`, `espada_piedra`, `espada_cobre`, `espada_hierro`, `espada_oro`, `espada_diamante`, `espada_netherite`, `maza`, `pico_cobre`, `pico_hierro`, `pico_diamante`, etc.
+- **Armaduras:** `casco_cuero`, `pechera_cuero`, `casco_cobre`, `pechera_cobre`, `casco_hierro`, `pechera_hierro`, `casco_diamante`, `pechera_diamante`, `casco_netherite`, `pechera_netherite`, `caparazon_tortuga`.
 - **Pociones:** `pocion_rara`, `pocion_fuerza`, `pocion_velocidad`, `pocion_curacion`, `pocion_vision_nocturna`, `pocion_invisibilidad`, `pocion_resistencia_fuego`, `pocion_dano`, `pocion_debilidad`, `pocion_ventisca`, `pocion_tejedora`.
 - **Entidades / Mobs:** `zombie`, `esqueleto`, `creeper`, `enderman`, `blaze`, `warden`, `breeze`, `bogged`, `phantom`, `vaca`, `aldeano`, `armadillo`, `lobo`.
 - **Elementos / Debilidades:** `luz_solar`, `fuego`, `agua`, `lobo`, `gato`, `bolas_nieve`, `distraccion_sonora`, `ataque_cuerpo_a_cuerpo`.

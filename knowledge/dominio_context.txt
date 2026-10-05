@@ -1,10 +1,10 @@
 # Base de Conocimiento del Dominio: Minecraft Java (Mecánicas de Supervivencia y Ecosistema)
 
 ## 1. Categorías y Entidades
-- **Armas:** Espadas (madera, piedra, hierro, oro, diamante, netherite), Maza (Breeze rod + Heavy core), Arco, Ballesta, Tridente.
-- **Herramientas:** Picos (madera, piedra, hierro, oro, diamante, netherite), Hacha de hierro, Pala de hierro, Azada de hierro.
+- **Armas:** Espadas (madera, piedra, cobre, hierro, oro, diamante, netherite), Maza (Breeze rod + Heavy core), Arco, Ballesta, Tridente.
+- **Herramientas:** Picos (madera, piedra, cobre, hierro, oro, diamante, netherite), Hacha de hierro, Pala de hierro, Azada de hierro.
 - **Armaduras y Piezas:**
-  - Materiales disponibles: Cuero, Hierro, Oro, Diamante, Netherite, Caparazón de Tortuga (casco).
+  - Materiales disponibles: Cuero, Cobre, Hierro, Oro, Diamante, Netherite, Caparazón de Tortuga (casco).
   - Piezas por material: Casco, Pechera, Pantalones (grebas), Botas.
   - Armadura de Lobo: Fabricada con escamas de Armadillo.
 - **Pociones:**

@@ -24,6 +24,7 @@
 % Armas
 categoria(espada_madera, arma).
 categoria(espada_piedra, arma).
+categoria(espada_cobre, arma).
 categoria(espada_hierro, arma).
 categoria(espada_oro, arma).
 categoria(espada_diamante, arma).
@@ -36,6 +37,7 @@ categoria(tridente, arma).
 % Herramientas
 categoria(pico_madera, herramienta).
 categoria(pico_piedra, herramienta).
+categoria(pico_cobre, herramienta).
 categoria(pico_hierro, herramienta).
 categoria(pico_oro, herramienta).
 categoria(pico_diamante, herramienta).
@@ -49,6 +51,11 @@ categoria(casco_cuero, armadura).
 categoria(pechera_cuero, armadura).
 categoria(pantalones_cuero, armadura).
 categoria(botas_cuero, armadura).
+
+categoria(casco_cobre, armadura).
+categoria(pechera_cobre, armadura).
+categoria(pantalones_cobre, armadura).
+categoria(botas_cobre, armadura).
 
 categoria(casco_hierro, armadura).
 categoria(pechera_hierro, armadura).
@@ -131,6 +138,11 @@ tipo_armadura(pechera_cuero, pechera).
 tipo_armadura(pantalones_cuero, pantalones).
 tipo_armadura(botas_cuero, botas).
 
+tipo_armadura(casco_cobre, casco).
+tipo_armadura(pechera_cobre, pechera).
+tipo_armadura(pantalones_cobre, pantalones).
+tipo_armadura(botas_cobre, botas).
+
 tipo_armadura(casco_hierro, casco).
 tipo_armadura(pechera_hierro, pechera).
 tipo_armadura(pantalones_hierro, pantalones).
@@ -155,6 +167,11 @@ material_de(casco_cuero, cuero).
 material_de(pechera_cuero, cuero).
 material_de(pantalones_cuero, cuero).
 material_de(botas_cuero, cuero).
+
+material_de(casco_cobre, cobre).
+material_de(pechera_cobre, cobre).
+material_de(pantalones_cobre, cobre).
+material_de(botas_cobre, cobre).
 
 material_de(casco_hierro, hierro).
 material_de(pechera_hierro, hierro).
@@ -187,6 +204,9 @@ requiere_directo(espada_madera, palo).
 requiere_directo(espada_piedra, adoquines).
 requiere_directo(espada_piedra, palo).
 
+requiere_directo(espada_cobre, lingote_cobre).
+requiere_directo(espada_cobre, palo).
+
 requiere_directo(espada_hierro, lingote_hierro).
 requiere_directo(espada_hierro, palo).
 
@@ -207,6 +227,8 @@ requiere_directo(pico_madera, tabla_madera).
 requiere_directo(pico_madera, palo).
 requiere_directo(pico_piedra, adoquines).
 requiere_directo(pico_piedra, palo).
+requiere_directo(pico_cobre, lingote_cobre).
+requiere_directo(pico_cobre, palo).
 requiere_directo(pico_hierro, lingote_hierro).
 requiere_directo(pico_hierro, palo).
 requiere_directo(pico_diamante, diamante).
@@ -219,6 +241,11 @@ requiere_directo(casco_cuero, cuero).
 requiere_directo(pechera_cuero, cuero).
 requiere_directo(pantalones_cuero, cuero).
 requiere_directo(botas_cuero, cuero).
+
+requiere_directo(casco_cobre, lingote_cobre).
+requiere_directo(pechera_cobre, lingote_cobre).
+requiere_directo(pantalones_cobre, lingote_cobre).
+requiere_directo(botas_cobre, lingote_cobre).
 
 requiere_directo(casco_hierro, lingote_hierro).
 requiere_directo(pechera_hierro, lingote_hierro).
@@ -242,6 +269,8 @@ requiere_directo(botas_netherite, lingote_netherite).
 % Materiales Base y Procesados
 requiere_directo(palo, tabla_madera).
 requiere_directo(tabla_madera, tronco_madera).
+requiere_directo(lingote_cobre, mena_cobre).
+requiere_directo(lingote_cobre, carbon).
 requiere_directo(lingote_hierro, mena_hierro).
 requiere_directo(lingote_hierro, carbon).
 requiere_directo(lingote_oro, mena_oro).
@@ -340,6 +369,8 @@ debil_contra(drowned, luz_solar).
 % Propiedades
 propiedad(madera, inflamable).
 propiedad(cuero, tinte_personalizable).
+propiedad(cobre, oxidable).
+propiedad(cobre, conductor).
 propiedad(hierro, versatil).
 propiedad(oro, afinidad_piglin).
 propiedad(diamante, alta_durabilidad).
