@@ -1,9 +1,16 @@
 # Proyecto N°2: Diseño de un Agente Inteligente que Usa Conocimiento
 
+
 **Universidad Andrés Bello (UNAB)**  
 **Facultad de Ingeniería — Ingeniería Civil Informática**  
 **Curso:** Fundamentos de Inteligencia Artificial  
-
+**
+Integrantes:
+Carlos Castro
+Ivan Gomez
+Matias Rodrigues
+Felipe Riquelme
+**
 ---
 
 ## 📋 Descripción del Proyecto
