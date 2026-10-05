@@ -4,13 +4,13 @@
 **Universidad Andrés Bello (UNAB)**  
 **Facultad de Ingeniería — Ingeniería Civil Informática**  
 **Curso:** Fundamentos de Inteligencia Artificial  
-**
+---
 Integrantes:
 Carlos Castro
 Ivan Gomez
 Matias Rodrigues
 Felipe Riquelme
-**
+
 ---
 
 ## 📋 Descripción del Proyecto
