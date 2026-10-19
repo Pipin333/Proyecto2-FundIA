@@ -1,0 +1,16 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fundia_knowledge_agent
+    ports:
+      - "8501:8501"
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+      - PYTHONUNBUFFERED=1
+      - PYTHONIOENCODING=utf-8
+    volumes:
+      # Montar knowledge para persistir cambios del editor en vivo
+      - ./knowledge:/app/knowledge
+    restart: unless-stopped

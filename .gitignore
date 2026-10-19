@@ -24,3 +24,8 @@ Thumbs.db
 # Archivos pesados o temporales de entregas previas
 *.zip
 Documento_Teeko_2.pdf
+
+# Carpetas locales no rastreadas en el repo de Proyecto 2
+Proyecto1/
+Enunciados/
+

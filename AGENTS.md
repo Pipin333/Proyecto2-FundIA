@@ -21,7 +21,7 @@ Cualquier modelo o agente de IA que trabaje en esta base de código (Claude Code
 ## 🏛️ 2. Arquitectura del Código
 - **`knowledge/base_conocimiento.pl`**: Hechos (`categoria/2`, `requiere_directo/2`, `debil_contra/2`) y reglas deductivas (`requiere_material_base/2`, etc.).
 - **`knowledge/dominio_context.txt`**: Documento de texto plano que sincroniza el conocimiento del dominio para inyectarlo como contexto al LLM.
-- **`backend/prolog_engine.py`**: Interfaz Python para invocar SWI-Prolog vía subprocess. Maneja errores elegantemente si `swipl` no está en PATH.
+- **`backend/prolog_engine.py`**: Interfaz Python para invocar SWI-Prolog vía subprocess y evaluador deductivo de fallback en memoria.
 - **`backend/llm_engine.py`**: Integración con el LLM (Gemini API), cargando el contexto desde `knowledge/dominio_context.txt`.
 - **`app.py`**: Frontend web en Streamlit con modos de consulta: Prolog, LLM y Comparativa.
 - **`docs/`**: Documentación formal requerida para las entregas académicas.
@@ -43,4 +43,5 @@ Cualquier modelo o agente de IA que trabaje en esta base de código (Claude Code
 ## 🛠️ 4. Comandos Frecuentes
 - **Ejecutar la app web:** `streamlit run app.py`
 - **Probar backend:** `python -c "import backend; print('OK')"`
+- **Ejecutar tests:** `python -m pytest`
 - **Probar Prolog por consola:** `swipl -s knowledge/base_conocimiento.pl`
